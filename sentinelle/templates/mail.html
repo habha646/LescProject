@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Analyser un mail · Sentinelle{% endblock %}
+{% block content %}
+  <h1>Analyser un mail</h1>
+  <p class="lede">Dépose un fichier .eml avant d'ouvrir un lien ou une pièce jointe douteuse.</p>
+
+  <form class="upload-form" method="post" enctype="multipart/form-data">
+    <label for="eml_file">Fichier .eml</label>
+    <input type="file" id="eml_file" name="eml_file" accept=".eml" required>
+    <button type="submit">Analyser</button>
+  </form>
+
+  {% if verdict %}
+    <section class="panel verdict-panel verdict-{{ verdict.verdict }}">
+      <h2>
+        {{ {"safe": "Ce mail semble sûr", "suspect": "Ce mail est suspect",
+            "dangerous": "Ce mail est dangereux"}[verdict.verdict] }}
+      </h2>
+      <p class="score">Score de risque : {{ verdict.score }}/100</p>
+      {% if verdict.explanation %}<p class="explanation">{{ verdict.explanation }}</p>{% endif %}
+      {% if verdict.reasons %}
+        <h3>Ce que nous avons observé</h3>
+        <ul>
+          {% for r in verdict.reasons %}<li>{{ r }}</li>{% endfor %}
+        </ul>
+      {% endif %}
+    </section>
+  {% endif %}
+
+  <section class="panel">
+    <h2>Historique récent</h2>
+    {% if history %}
+      <ul class="analysis-list">
+        {% for an in history %}
+          <li class="verdict verdict-{{ an.verdict }}">
+            <strong>{{ {"safe": "Sûr", "suspect": "Suspect", "dangerous": "Dangereux"}[an.verdict] }}</strong>
+            — score {{ an.score }}/100 · {{ an.created_at[:16].replace("T", " ") }}
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="empty">Aucun historique pour l'instant.</p>
+    {% endif %}
+  </section>
+{% endblock %}

@@ -1,0 +1,20 @@
+From: banque-securite@faux-domaine-xn--exemple.com
+Subject: Action urgente requise sur votre compte
+Authentication-Results: spf=fail dkim=fail
+Content-Type: multipart/mixed; boundary="LIMITE"
+
+--LIMITE
+Content-Type: text/plain
+
+Bonjour,
+
+Nous avons detecte une activite inhabituelle. Cliquez ici immediatement,
+votre compte sera ferme sous 24h si vous ne reagissez pas :
+http://secure-verif.xn--banqu-exemple.com/login
+
+--LIMITE
+Content-Type: application/octet-stream; name="facture_impayee.exe"
+Content-Disposition: attachment; filename="facture_impayee.exe"
+
+CECI EST UN FICHIER DE TEST, PAS UN VRAI VIRUS
+--LIMITE--

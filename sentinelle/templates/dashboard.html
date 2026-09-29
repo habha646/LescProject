@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Tableau de bord · Sentinelle{% endblock %}
+{% block content %}
+  <h1>Vue d'ensemble</h1>
+  <p class="lede">Ce que Sentinelle surveille en ce moment sur votre réseau et vos mails.</p>
+
+  <div class="stat-grid">
+    <div class="stat">
+      <span class="stat-value">{{ counts.devices }}</span>
+      <span class="stat-label">Appareils connus</span>
+    </div>
+    <div class="stat {{ 'stat-warn' if counts.unknown else '' }}">
+      <span class="stat-value">{{ counts.unknown }}</span>
+      <span class="stat-label">Appareils inconnus</span>
+    </div>
+    <div class="stat">
+      <span class="stat-value">{{ counts.analyses }}</span>
+      <span class="stat-label">Mails analysés</span>
+    </div>
+    <div class="stat">
+      <span class="stat-value">{{ counts.alerts }}</span>
+      <span class="stat-label">Alertes au total</span>
+    </div>
+  </div>
+
+  <section class="panel">
+    <h2>Dernières alertes</h2>
+    {% if alerts %}
+      <ul class="alert-list">
+        {% for a in alerts %}
+          <li class="alert alert-{{ a.severity }}">
+            <strong>{{ a.title }}</strong>
+            {% if a.explanation %}<p>{{ a.explanation }}</p>{% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="empty">Aucune alerte pour l'instant.</p>
+    {% endif %}
+  </section>
+
+  <section class="panel">
+    <h2>Derniers mails analysés</h2>
+    {% if analyses %}
+      <ul class="analysis-list">
+        {% for an in analyses %}
+          <li class="verdict verdict-{{ an.verdict }}">
+            <strong>{{ {"safe": "Sûr", "suspect": "Suspect", "dangerous": "Dangereux"}[an.verdict] }}</strong>
+            — score {{ an.score }}/100
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="empty">Aucun mail analysé pour l'instant.</p>
+    {% endif %}
+  </section>
+{% endblock %}

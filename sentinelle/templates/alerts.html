@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Alertes · Sentinelle{% endblock %}
+{% block content %}
+  <h1>Toutes les alertes</h1>
+  {% if alerts %}
+    <ul class="alert-list">
+      {% for a in alerts %}
+        <li class="alert alert-{{ a.severity }}">
+          <strong>{{ a.title }}</strong>
+          {% if a.explanation %}<p>{{ a.explanation }}</p>{% endif %}
+          <span class="meta">{{ a.created_at[:16].replace("T", " ") }}</span>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="empty">Aucune alerte pour l'instant.</p>
+  {% endif %}
+{% endblock %}

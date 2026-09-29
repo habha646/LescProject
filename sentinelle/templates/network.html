@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Réseau · Sentinelle{% endblock %}
+{% block content %}
+  <h1>Appareils du réseau</h1>
+  <p class="lede">Ce qui est connecté chez vous en ce moment.</p>
+
+  <form method="post" action="{{ url_for('network.run_scan') }}">
+    <button type="submit">Lancer un scan</button>
+  </form>
+
+  {% if devices %}
+    <table class="device-table">
+      <thead>
+        <tr><th>État</th><th>Nom</th><th>Adresse IP</th><th>Type</th><th></th></tr>
+      </thead>
+      <tbody>
+        {% for d in devices %}
+          <tr class="{{ 'row-unknown' if not d.known else '' }}">
+            <td>{{ "Connu" if d.known else "Inconnu" }}</td>
+            <td>{{ d.hostname or "—" }}</td>
+            <td>{{ d.ip }}</td>
+            <td>{{ d.vendor or "—" }}</td>
+            <td>
+              {% if not d.known %}
+                <form method="post" action="{{ url_for('network.mark_known', mac=d.mac) }}">
+                  <button type="submit" class="btn-small">C'est à moi</button>
+                </form>
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p class="empty">Aucun scan effectué pour l'instant.</p>
+  {% endif %}
+{% endblock %}
