@@ -1,0 +1,21 @@
+From: "Mutuelle Horizon" <releves@mutuelle-horizon.test>
+To: client@example.com
+Subject: Votre releve de remboursements
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="SEP"
+
+--SEP
+Content-Type: text/plain; charset=utf-8
+
+Bonjour,
+
+Votre releve de remboursements du mois est disponible en piece jointe.
+
+Mutuelle Horizon
+
+--SEP
+Content-Type: application/octet-stream; name="releve_septembre.pdf.exe"
+Content-Disposition: attachment; filename="releve_septembre.pdf.exe"
+
+FICHIER DE TEST
+--SEP--

@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block title %}Console · Sentinelle{% endblock %}
+{% block head %}<link rel="stylesheet" href="{{ url_for('static', filename='console.css') }}">{% endblock %}
+{% block body_class %}console-body{% endblock %}
+
+{# Le compagnon : des anneaux animés en CSS (pas d'image) #}
+{% macro reactor(with_wave=True) %}
+  <div class="orb" aria-hidden="true">
+    <span class="ring ring-1"></span>
+    <span class="ring ring-ticks"></span>
+    <span class="ring ring-2"></span>
+    <span class="ring ring-3"></span>
+    <span class="ring ring-4"></span>
+    <span class="core">{% if with_wave %}<span class="wave"><i></i><i></i><i></i><i></i><i></i></span>{% endif %}</span>
+  </div>
+{% endmacro %}
+
+{# ===== 1. ÉCRAN DE DÉMARRAGE : chaque ligne du journal = un vrai contrôle (voir console.js) ===== #}
+{% block before_page %}
+  <div class="boot" id="boot" role="status" aria-live="polite">
+    {{ reactor(with_wave=False) }}
+    <p class="boot-hello boot-intro">Bienvenue sur votre</p>
+    <h1 class="boot-title">compagnon de sécurité</h1>
+    <ol class="boot-log" id="boot-log"></ol>
+    <div class="boot-bar"><span id="boot-progress"></span></div>
+    <p class="boot-hint" id="boot-hint"></p>
+
+    {# Premier démarrage : on demande le prénom #}
+    <form class="boot-name" id="boot-name" hidden>
+      <label for="boot-name-input">Première visite : comment tu t'appelles ?</label>
+      <div class="boot-name-row">
+        <input id="boot-name-input" type="text" maxlength="40" autocomplete="given-name" placeholder="Ton prénom" required>
+        <button type="submit">Valider</button>
+      </div>
+      <p class="boot-name-error" id="boot-name-error" role="alert"></p>
+    </form>
+
+    {# « Bienvenue, prénom » #}
+    <div class="boot-welcome" id="boot-welcome" hidden>
+      <p class="boot-welcome-name">Bienvenue, <span id="boot-welcome-name"></span></p>
+    </div>
+    <button type="button" class="btn-ghost boot-skip" id="boot-skip">Entrer</button>
+  </div>
+{% endblock %}
+
+{# ===== 2. LA CONSOLE (3 colonnes) ===== #}
+{% block page %}
+  <div class="console" id="console">
+    <!-- Gauche : déposer un mail + journal des résultats -->
+    <aside class="col col-left">
+      <section class="card">
+        <header class="card-head"><h2>Dépôt rapide</h2></header>
+        <label class="dropzone" id="dropzone">
+          <input type="file" id="eml-input" accept=".eml" hidden>
+          <span class="drop-icon" aria-hidden="true">✉</span>
+          <span>Glisse un fichier <strong>.eml</strong> ici</span>
+          <span class="muted">ou clique pour le choisir</span>
+        </label>
+      </section>
+
+      <section class="card card-grow">
+        <header class="card-head"><h2>Informations</h2></header>
+        <ul class="feed" id="feed"></ul>
+      </section>
+    </aside>
+
+    <!-- Centre : le compagnon et les compteurs -->
+    <main class="col col-center">
+      {{ reactor() }}
+      <h1 class="companion-name">SENTINELLE</h1>
+      <p class="companion-status" id="companion-status">Prêt à analyser</p>
+      <dl class="mini-stats">
+        <div class="card"><dt>Analysés</dt><dd id="stat-total">–</dd></div>
+        <div class="card"><dt>Sûrs</dt><dd id="stat-safe">–</dd></div>
+        <div class="card"><dt>Suspects</dt><dd id="stat-suspect">–</dd></div>
+        <div class="card"><dt>Dangereux</dt><dd id="stat-dangerous">–</dd></div>
+      </dl>
+    </main>
+
+    <!-- Droite : les messages du compagnon -->
+    <aside class="col col-right">
+      <section class="card card-chat">
+        <header class="card-head">
+          <h2>Compagnon</h2>
+          <button type="button" class="btn-small btn-ghost" id="forget-name"
+                  title="Efface le prénom gardé dans ce navigateur">Oublier mon nom</button>
+        </header>
+        <ol class="chat" id="chat" aria-live="polite"></ol>
+        <p class="chat-soon">Discussion avec le compagnon : en cours de construction.</p>
+      </section>
+    </aside>
+  </div>
+{% endblock %}
+
+{% block scripts %}<script src="{{ url_for('static', filename='console.js') }}"></script>{% endblock %}

@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}{{ zone }} · Sentinelle{% endblock %}
+{% block content %}
+  <div class="construction">
+    <div class="construction-mark" aria-hidden="true"><span></span></div>
+    <p class="kicker">Zone {{ zone }}</p>
+    <h1>En cours de construction</h1>
+    <p class="lede">{{ description }} Ce module arrive bientôt.</p>
+    <a class="btn" href="{{ url_for('mail.index') }}">Analyser un mail en attendant</a>
+  </div>
+{% endblock %}

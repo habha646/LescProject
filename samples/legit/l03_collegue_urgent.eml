@@ -1,0 +1,13 @@
+From: Sophie Bernard <sophie.bernard@entreprise-exemple.example>
+To: equipe@entreprise-exemple.example
+Subject: URGENT : reunion avancee a 14h
+Authentication-Results: mx.entreprise-exemple.example; spf=pass; dkim=pass
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+
+Bonjour a tous,
+
+Le client a avance son rendez-vous, la reunion de projet passe donc a 14h
+en salle B au lieu de 16h. Merci de prevenir ceux qui ne lisent pas leurs mails !
+
+Sophie

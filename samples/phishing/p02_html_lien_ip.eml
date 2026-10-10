@@ -1,0 +1,13 @@
+From: "Colis Rapide" <info@colisrapide-notification.test>
+To: client@example.com
+Subject: Votre colis est bloque en entrepot
+MIME-Version: 1.0
+Content-Type: text/html; charset=utf-8
+
+<html><body>
+<p>Bonjour,</p>
+<p>Votre colis n'a pas pu etre livre. Des frais de 1,99 EUR sont a regler immediatement
+pour eviter le retour a l'expediteur.</p>
+<p><a href="http://192.0.2.45/colis/paiement">Regler les frais de livraison</a></p>
+<p>L'equipe Colis Rapide</p>
+</body></html>

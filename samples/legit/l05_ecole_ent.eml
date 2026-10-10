@@ -1,0 +1,15 @@
+From: "Lycee Exemple" <ne-pas-repondre@lycee-exemple.example>
+To: eleve@example.com
+Subject: Nouveau document dans votre espace ENT
+Authentication-Results: mx.example.com; spf=pass; dkim=pass
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+
+Bonjour,
+
+Un nouveau document a ete depose dans votre espace : "Planning des examens blancs".
+Consultez-le sur l'ENT :
+
+https://ent.lycee-exemple.example/documents
+
+La vie scolaire

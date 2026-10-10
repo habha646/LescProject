@@ -1,0 +1,16 @@
+From: "MonAppli" <securite@monappli.example>
+To: moi@example.com
+Subject: Reinitialisation de votre mot de passe
+Authentication-Results: mx.example.com; spf=pass; dkim=pass
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+
+Bonjour,
+
+Vous avez demande a reinitialiser votre mot de passe. Ce lien est valable 30 minutes :
+
+https://compte.monappli.example/reinitialiser?jeton=4f9a2c
+
+Si vous n'etes pas a l'origine de cette demande, ignorez simplement ce message.
+
+L'equipe MonAppli

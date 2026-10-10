@@ -1,0 +1,15 @@
+From: "Colis Rapide" <suivi@colisrapide.example>
+To: client@example.com
+Subject: Votre colis CR-77120 a ete expedie
+Authentication-Results: mx.example.com; spf=pass; dkim=pass
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+
+Bonjour,
+
+Votre colis a ete remis a notre transporteur. Livraison prevue jeudi.
+Suivez-le ici :
+
+https://suivi.colisrapide.example/colis/CR-77120
+
+Colis Rapide

@@ -1,0 +1,13 @@
+From: "Impots Fictifs" <remboursement@impots-fictifs-gouv.test>
+To: client@example.com
+Subject: Vous avez droit a un remboursement de 248,50 EUR
+MIME-Version: 1.0
+Content-Type: text/html; charset=utf-8
+
+<html><body>
+<p>Madame, Monsieur,</p>
+<p>Apres le calcul de votre impot, vous etes eligible a un remboursement de 248,50 EUR.</p>
+<p>Pour le recevoir, connectez-vous sur
+<a href="http://remboursement-dossier.test/formulaire">https://www.impots-fictifs.example/espace-particulier</a></p>
+<p>Direction des finances fictives</p>
+</body></html>

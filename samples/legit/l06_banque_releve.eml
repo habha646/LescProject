@@ -1,0 +1,15 @@
+From: "Banque Lumiere" <information@banque-lumiere.example>
+To: client@example.com
+Subject: Votre releve de compte est disponible
+Authentication-Results: mx.example.com; spf=pass smtp.mailfrom=banque-lumiere.example; dkim=pass
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+
+Bonjour,
+
+Votre releve de compte de septembre est disponible dans votre espace client.
+Pour le consulter, connectez-vous comme d'habitude depuis notre application.
+
+Nous ne vous demanderons jamais vos codes par mail.
+
+Banque Lumiere

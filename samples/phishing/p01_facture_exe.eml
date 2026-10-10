@@ -1,0 +1,23 @@
+From: "Banque Lumiere" <securite@banque-lumiere-alerte.test>
+To: client@example.com
+Subject: Action urgente requise sur votre compte
+Authentication-Results: mx.example.com; spf=fail smtp.mailfrom=banque-lumiere-alerte.test; dkim=fail
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="LIMITE"
+
+--LIMITE
+Content-Type: text/plain; charset=utf-8
+
+Bonjour,
+
+Une facture impayee bloque votre compte. Ouvrez la piece jointe immédiatement,
+sinon votre compte sera fermé sous 24h.
+
+Service securite Banque Lumiere
+
+--LIMITE
+Content-Type: application/octet-stream; name="facture_impayee.exe"
+Content-Disposition: attachment; filename="facture_impayee.exe"
+
+FICHIER DE TEST, PAS UN VRAI PROGRAMME
+--LIMITE--

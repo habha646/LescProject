@@ -1,0 +1,26 @@
+From: Tante Claire <claire.petit@example.com>
+To: moi@example.com
+Subject: Les photos des vacances
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="SEP"
+
+--SEP
+Content-Type: text/plain; charset=utf-8
+
+Coucou,
+
+Voici quelques photos de notre semaine en Bretagne. Bisous a tous !
+
+Claire
+
+--SEP
+Content-Type: image/jpeg; name="plage.jpg"
+Content-Disposition: attachment; filename="plage.jpg"
+
+IMAGE DE TEST
+--SEP
+Content-Type: image/jpeg; name="phare.jpg"
+Content-Disposition: attachment; filename="phare.jpg"
+
+IMAGE DE TEST
+--SEP--

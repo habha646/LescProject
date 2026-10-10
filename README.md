@@ -1,92 +1,81 @@
 # Sentinelle
 
-Projet ICT Complémentaire — S7. Un compagnon local qui aide un particulier ou petit
-entrepreneur à repérer les mails/liens dangereux et à savoir ce qui se passe sur son
-réseau domestique, expliqué en langage clair.
+Projet ICT Complémentaire (S7). Un compagnon de sécurité local qui aide un particulier
+ou un petit entrepreneur à repérer les mails dangereux, expliqué en langage clair.
 
 Équipe : Harone (fondation, front-end, back-end), David (réseau), Svetoslav (IA).
 
-## Démarrer en 5 minutes
+**État actuel : seul le module MAIL fonctionne.** Les pages Réseau, Alertes et
+Assistant IA affichent « en cours de construction ». Leur ancien code est gardé dans
+la branche git `sauvegarde-avant-nettoyage`.
 
-```bash
-python3 -m venv .venv
-source .venv/bin/activate        # Windows : .venv\Scripts\activate
-pip install -r requirements.txt
+## Lancer l'appli (PowerShell, depuis ce dossier)
 
-cp .env.example .env             # copie la config d'exemple, ne modifie jamais .env.example
+```
+python -m venv .venv                 # une seule fois
+.venv\Scripts\Activate.ps1
+pip install -r requirements.txt      # une seule fois
 python run.py
 ```
 
-Ouvre http://127.0.0.1:5000 — l'app tourne déjà avec des données simulées, sans
-rien configurer de plus.
+Puis ouvre http://127.0.0.1:5000 (`Ctrl+C` dans le terminal pour arrêter).
 
-## Lancer les tests
-
-```bash
-python -m pytest
-```
-
-Lance-les **avant chaque commit**. Un test qui casse = on ne pousse pas sur `main`
-tant que ce n'est pas réglé ensemble.
-
-## Comment le projet est organisé
+## Vérifier que tout marche
 
 ```
+python -m pytest -v            # les tests automatiques
+python tools/evaluate.py -v    # le score de détection sur les 20 mails d'essai
+```
+
+## Carte du projet : où est quoi
+
+Le trajet d'un mail : **page web → route → services → module mail → base**.
+
+```
+run.py                          lance le serveur
 sentinelle/
-  config.py          config de l'app (variables d'environnement, voir .env.example)
-  models.py          ⭐ les structures partagées entre tous les modules (LIRE EN PREMIER)
-  db.py               connexion et schéma de la base SQLite
-  repository.py       toutes les requêtes SQL (rien d'autre ne doit toucher la base)
-  routes/              une page = un fichier ; relie modules + templates
-  templates/            les pages HTML (Jinja2)
-  static/style.css      le style visuel
-  modules/
-    network/           ⭐ DAVID — scan du réseau
-    ai/                ⭐ SVETOSLAV — explications en langage clair
-    mail/              analyse des mails .eml (base commune)
-tests/                 les tests automatiques
-docs/                  décisions d'équipe, notes de rétrospective
+  __init__.py                   crée l'appli Flask et branche les routes
+  config.py                     réglages (base de données, taille max d'un mail)
+  models.py                     MailVerdict : le résultat d'une analyse
+  db.py                         la table "analyses" (SQLite)
+  repository.py                 toutes les requêtes SQL
+  services.py                   analyser un mail puis enregistrer le verdict
+  modules/mail/
+    parser.py                   découpe le fichier .eml (expéditeur, liens, pièces jointes)
+    rules.py                    ⭐ LES RÈGLES DE DÉTECTION : c'est ici qu'on améliore le score
+    autotest.py                 teste le moteur sur samples/
+  routes/
+    dashboard.py                page d'accueil (la console)
+    mail_routes.py              page « Analyse mail »
+    api.py                      l'API JSON utilisée par la console
+    construction.py             pages « en cours de construction »
+  templates/                    les pages HTML
+    base.html                   en-tête commun à toutes les pages
+    console.html                la console + l'écran de démarrage
+    mail.html                   page « Analyse mail »
+    construction.html           page « en cours de construction »
+  static/
+    style.css                   le design commun (couleurs, cartes, boutons)
+    console.css                 le design propre à la console
+    console.js                  le comportement de la console
+    hud.js                      l'horloge de l'en-tête
+samples/
+  phishing/                     10 mails piégés (doivent être détectés)
+  legit/                        10 mails normaux (ne doivent pas être détectés)
+tools/evaluate.py               mesure la détection sur samples/
+tests/                          les tests automatiques
+docs/                           décisions, rétrospectives, exercices
 ```
 
-## Qui touche à quoi
+## Garde-fous en place
 
-- **David → `sentinelle/modules/network/`**. Une seule fonction à écrire :
-  `scan()` dans `scanner.py`. Tout le reste (garde-fou légal, enregistrement en
-  base, création d'alerte, affichage) est déjà branché. Lis
-  `sentinelle/modules/network/__init__.py` pour le contrat exact.
-- **Svetoslav → `sentinelle/modules/ai/`**. Deux fonctions à écrire dans
-  `explainer.py` : `explain_with_llm` et `explain_mail_with_llm`. Le produit
-  fonctionne déjà sans IA (texte prédéfini) — ton travail l'améliore, il ne
-  bloque jamais l'équipe.
-- **Harone → tout le reste** : routes, templates, base de données, module mail,
-  intégration.
+- Pas de lecture automatique d'une vraie boîte mail : dépôt manuel de fichiers `.eml`
+- Le contenu d'un mail n'est jamais stocké, seulement son empreinte (sha256) et le verdict
+- Le prénom de l'utilisateur reste dans son navigateur, jamais sur le serveur
+- Protection CSRF (en-tête `X-Sentinelle`) et XSS (`textContent`) : voir `routes/api.py` et `static/console.js`
 
-**Règle d'or : ne modifie jamais les signatures dans `models.py` ou dans les
-`__init__.py` des modules sans en parler aux deux autres d'abord.** C'est ce qui
-permet à chacun de travailler sans casser le travail des autres.
-
-## Modes de fonctionnement (fichier `.env`)
-
-- `SENTINELLE_NETWORK_MODE=fake` (par défaut) : appareils simulés, pour développer
-  sans vrai réseau. Passe à `real` seulement sur un réseau qui t'appartient.
-- `SENTINELLE_ALLOWED_SUBNETS` : liste blanche des réseaux qu'on a le droit de
-  scanner. **Ne scanne jamais un réseau qui n'est pas le tien.**
-- `SENTINELLE_AI_MODE=template` (par défaut) : textes prédéfinis. Passe à
-  `ollama` une fois le modèle local branché.
-
-## Garde-fous déjà en place (ne pas contourner)
-
-- Pas d'interception du trafic chiffré (pas de MITM)
-- Pas de lecture automatique d'une vraie boîte mail — dépôt manuel de fichiers `.eml`
-- Le contenu d'un mail n'est jamais stocké en base, seulement son empreinte (sha256)
-  et le verdict — voir `sentinelle/db.py`
-- Un scan réseau réel est bloqué si le sous-réseau n'est pas dans la liste
-  autorisée (`sentinelle/modules/network/guard.py`)
-- L'IA explique et propose ; elle ne décide et n'exécute jamais une action seule
-
-## Workflow Git (à respecter)
+## Workflow Git
 
 1. Une branche par tâche : `git checkout -b feature/nom-de-la-tache`
-2. Commits courts et clairs : `git commit -m "réseau: implémente le scan via table ARP"`
-3. Pull request vers `main`, même à 3 — ça garde une trace pour le rapport et la défense
-4. `main` doit toujours pouvoir se lancer avec `python run.py` sans erreur
+2. Commits courts et clairs : `git commit -m "mail: ajoute la règle Reply-To"`
+3. Lance les tests **avant chaque commit**

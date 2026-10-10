@@ -1,27 +1,9 @@
+"""Connexion à la base SQLite et création des tables."""
 import sqlite3
 
 from flask import current_app, g
 
 SCHEMA = """
-CREATE TABLE IF NOT EXISTS devices (
-    mac TEXT PRIMARY KEY,
-    ip TEXT NOT NULL,
-    hostname TEXT DEFAULT '',
-    vendor TEXT DEFAULT '',
-    known INTEGER NOT NULL DEFAULT 0,
-    first_seen TEXT NOT NULL,
-    last_seen TEXT NOT NULL
-);
-CREATE TABLE IF NOT EXISTS alerts (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    dedupe_key TEXT UNIQUE,
-    source TEXT NOT NULL,
-    severity TEXT NOT NULL,
-    title TEXT NOT NULL,
-    details TEXT NOT NULL DEFAULT '{}',
-    explanation TEXT,
-    created_at TEXT NOT NULL
-);
 -- RGPD : on ne stocke JAMAIS le contenu d'un mail, seulement l'empreinte et le verdict.
 CREATE TABLE IF NOT EXISTS analyses (
     id INTEGER PRIMARY KEY AUTOINCREMENT,

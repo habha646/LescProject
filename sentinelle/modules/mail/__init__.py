@@ -1,7 +1,6 @@
 """Module MAIL — analyse d'un fichier .eml déposé manuellement.
 
-Base déjà fonctionnelle (règles simples). Peut être enrichi par n'importe qui
-(David ou Svetoslav) une fois son propre module avancé — pas de propriétaire unique.
+Le chemin d'un mail : parser.py (découpe le fichier) -> rules.py (calcule le score).
 
 CONTRAT :
     analyze_eml(raw_bytes: bytes) -> MailVerdict

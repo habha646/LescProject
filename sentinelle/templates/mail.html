@@ -1,22 +1,30 @@
 {% extends "base.html" %}
-{% block title %}Analyser un mail · Sentinelle{% endblock %}
+{% block title %}Analyse mail · Sentinelle{% endblock %}
 {% block content %}
+  {% set labels = {"safe": "Sûr", "suspect": "Suspect", "dangerous": "Dangereux"} %}
+  <p class="kicker">Zone mail</p>
   <h1>Analyser un mail</h1>
-  <p class="lede">Dépose un fichier .eml avant d'ouvrir un lien ou une pièce jointe douteuse.</p>
+  <p class="lede">Dépose un fichier .eml avant d'ouvrir un lien ou une pièce jointe douteuse.
+    Seule son empreinte est gardée, jamais son contenu.</p>
 
-  <form class="upload-form" method="post" enctype="multipart/form-data">
-    <label for="eml_file">Fichier .eml</label>
-    <input type="file" id="eml_file" name="eml_file" accept=".eml" required>
-    <button type="submit">Analyser</button>
-  </form>
+  <section class="card">
+    <header class="card-head"><h2>Déposer un fichier</h2></header>
+    <form class="upload-form" method="post" enctype="multipart/form-data">
+      <label for="eml_file">Fichier .eml</label>
+      <input type="file" id="eml_file" name="eml_file" accept=".eml" required>
+      <button type="submit">Analyser</button>
+    </form>
+  </section>
 
   {% if verdict %}
-    <section class="panel verdict-panel verdict-{{ verdict.verdict }}">
+    <section class="card verdict-panel verdict-{{ verdict.verdict }}">
+      <header class="card-head"><h2>Résultat</h2></header>
       <h2>
         {{ {"safe": "Ce mail semble sûr", "suspect": "Ce mail est suspect",
             "dangerous": "Ce mail est dangereux"}[verdict.verdict] }}
       </h2>
       <p class="score">Score de risque : {{ verdict.score }}/100</p>
+      <div class="gauge"><span style="width: {{ verdict.score }}%"></span></div>
       {% if verdict.explanation %}<p class="explanation">{{ verdict.explanation }}</p>{% endif %}
       {% if verdict.reasons %}
         <h3>Ce que nous avons observé</h3>
@@ -27,14 +35,14 @@
     </section>
   {% endif %}
 
-  <section class="panel">
-    <h2>Historique récent</h2>
+  <section class="card">
+    <header class="card-head"><h2>Historique récent</h2></header>
     {% if history %}
       <ul class="analysis-list">
         {% for an in history %}
           <li class="verdict verdict-{{ an.verdict }}">
-            <strong>{{ {"safe": "Sûr", "suspect": "Suspect", "dangerous": "Dangereux"}[an.verdict] }}</strong>
-            — score {{ an.score }}/100 · {{ an.created_at[:16].replace("T", " ") }}
+            <strong>{{ labels[an.verdict] }}</strong> · score {{ an.score }}/100
+            <span class="meta">{{ an.created_at[:16].replace("T", " ") }} · empreinte {{ an.sha256[:12] }}…</span>
           </li>
         {% endfor %}
       </ul>

@@ -1,0 +1,14 @@
+From: "Colis Rapide" <suivi@colis-rapide-livraison.test>
+To: client@example.com
+Subject: Livraison en attente - confirmez votre adresse
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+
+Bonjour,
+
+Votre colis numero CR-88412 est en attente. Confirmez votre adresse et reglez
+les frais de reexpedition ici :
+
+http://www.colisrapide.example.suivi.livraison-frais.test/confirmer
+
+Colis Rapide

@@ -1,10 +1,7 @@
-import hashlib
-
 from flask import Blueprint, flash, render_template, request
 
 from .. import repository as repo
-from ..modules import ai
-from ..modules.mail import analyze_eml
+from ..services import analyze_and_store
 
 bp = Blueprint("mail", __name__, url_prefix="/mail")
 
@@ -17,11 +14,6 @@ def index():
         if not f or not f.filename:
             flash("Choisis d'abord un fichier .eml.", "warning")
         else:
-            raw = f.read()
-            verdict = analyze_eml(raw)
-            verdict.explanation = ai.explain_mail(verdict)
-            # RGPD : on garde seulement l'empreinte (sha256), jamais le contenu du mail
-            digest = hashlib.sha256(raw).hexdigest()
-            repo.add_analysis(digest, verdict.verdict, verdict.score, verdict.reasons)
+            verdict = analyze_and_store(f.read())
 
     return render_template("mail.html", verdict=verdict, history=repo.list_analyses(limit=10))

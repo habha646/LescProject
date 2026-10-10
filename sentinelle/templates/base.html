@@ -5,19 +5,29 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}Sentinelle{% endblock %}</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  {% block head %}{% endblock %}
 </head>
-<body>
-  <div class="shell">
-    <header class="topbar">
-      <a class="brand" href="{{ url_for('dashboard.index') }}">
+<body class="{% block body_class %}{% endblock %}">
+  {% block before_page %}{% endblock %}
+
+  <div class="page" id="page">
+    {# En-tête commun à TOUTES les pages : même design partout #}
+    <header class="hud-top">
+      <a class="hud-brand" href="{{ url_for('dashboard.index') }}">
         <span class="brand-mark" aria-hidden="true"></span>
-        Sentinelle
+        SENTINELLE
+        <span class="badge-online">En ligne</span>
       </a>
-      <nav>
-        <a href="{{ url_for('dashboard.index') }}">Tableau de bord</a>
-        <a href="{{ url_for('mail.index') }}">Analyser un mail</a>
-        <a href="{{ url_for('network.index') }}">Réseau</a>
-        <a href="{{ url_for('alerts.index') }}">Alertes</a>
+      <div class="hud-clock" id="clock" aria-label="Heure"></div>
+      <nav class="hud-nav" aria-label="Zones">
+        {% set pages = [("dashboard.index", "dashboard", "Console"), ("mail.index", "mail", "Analyse mail"),
+                        ("construction.network", "construction.network", "Réseau"),
+                        ("construction.alerts", "construction.alerts", "Alertes"),
+                        ("construction.ai", "construction.ai", "Assistant IA")] %}
+        {% for endpoint, key, label in pages %}
+          <a href="{{ url_for(endpoint) }}"
+             {% if request.endpoint == endpoint %}aria-current="page"{% endif %}>{{ label }}</a>
+        {% endfor %}
       </nav>
     </header>
 
@@ -31,13 +41,17 @@
       {% endif %}
     {% endwith %}
 
-    <main>
-      {% block content %}{% endblock %}
-    </main>
-
-    <footer>
-      Projet étudiant · fonctionne entièrement en local · aucune donnée envoyée à l'extérieur sans action explicite
-    </footer>
+    {% block page %}
+      <main class="content">
+        {% block content %}{% endblock %}
+      </main>
+      <footer>
+        Projet étudiant · fonctionne entièrement en local · aucune donnée envoyée à l'extérieur sans action explicite
+      </footer>
+    {% endblock %}
   </div>
+
+  <script src="{{ url_for('static', filename='hud.js') }}"></script>
+  {% block scripts %}{% endblock %}
 </body>
 </html>

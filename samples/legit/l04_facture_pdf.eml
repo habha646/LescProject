@@ -1,0 +1,24 @@
+From: "Fournitures Durand" <facturation@fournitures-durand.example>
+To: compta@entreprise-exemple.example
+Subject: Facture F-2026-0457
+Authentication-Results: mx.entreprise-exemple.example; spf=pass; dkim=pass
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="SEP"
+
+--SEP
+Content-Type: text/plain; charset=utf-8
+
+Bonjour,
+
+Vous trouverez ci-joint la facture correspondant a votre commande du 2 octobre.
+Paiement a 30 jours, comme d'habitude.
+
+Cordialement,
+Fournitures Durand
+
+--SEP
+Content-Type: application/pdf; name="Facture_F-2026-0457.pdf"
+Content-Disposition: attachment; filename="Facture_F-2026-0457.pdf"
+
+PDF DE TEST
+--SEP--

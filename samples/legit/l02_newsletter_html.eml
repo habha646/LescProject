@@ -1,0 +1,13 @@
+From: "Boutique Verte" <newsletter@boutique-verte.example>
+To: moi@example.com
+Subject: Les nouveautes d'octobre sont arrivees
+Authentication-Results: mx.example.com; spf=pass smtp.mailfrom=boutique-verte.example; dkim=pass
+MIME-Version: 1.0
+Content-Type: text/html; charset=utf-8
+
+<html><body>
+<h1>Nouveautes d'octobre</h1>
+<p>Decouvrez nos nouvelles plantes d'interieur et nos conseils d'arrosage pour l'automne.</p>
+<p><a href="https://www.boutique-verte.example/nouveautes">Voir les nouveautes</a></p>
+<p><a href="https://www.boutique-verte.example/desabonnement">Se desabonner</a></p>
+</body></html>

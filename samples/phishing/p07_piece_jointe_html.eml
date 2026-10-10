@@ -1,0 +1,22 @@
+From: "Comptabilite" <compta@fournisseur-bureau.test>
+To: client@example.com
+Subject: Facture N 2026-1182
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="SEP"
+
+--SEP
+Content-Type: text/plain; charset=utf-8
+
+Bonjour,
+
+Veuillez trouver ci-joint votre facture. Ouvrez le document et connectez-vous
+avec votre adresse mail pour le visualiser.
+
+Cordialement
+
+--SEP
+Content-Type: text/html; name="Facture_2026-1182.html"
+Content-Disposition: attachment; filename="Facture_2026-1182.html"
+
+<html><body>PAGE DE TEST</body></html>
+--SEP--

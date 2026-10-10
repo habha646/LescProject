@@ -1,0 +1,15 @@
+From: "PayFacile" <service@payfacile-support.test>
+To: client@example.com
+Subject: Activite inhabituelle detectee
+Authentication-Results: mx.example.com; spf=softfail; dkim=fail
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+
+Bonjour,
+
+Nous avons detecte une connexion inhabituelle a votre compte PayFacile.
+Vérifiez votre compte pour eviter toute restriction :
+
+https://xn--payfacle-9db.test/connexion
+
+L'equipe PayFacile

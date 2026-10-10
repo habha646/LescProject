@@ -1,0 +1,190 @@
+/* Console Sentinelle — ce qui est propre à la page principale :
+   la grille en 3 colonnes, le compagnon (réacteur animé), la discussion, l'écran de démarrage.
+   Le reste (couleurs, cartes, boutons, en-tête) vient de style.css. */
+
+/* ---------- Grille en 3 colonnes ---------- */
+.console-body .page { height: 100vh; display: flex; flex-direction: column; }
+.console {
+  flex: 1; min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(270px, 340px) 1fr minmax(290px, 380px);
+  gap: 16px;
+  padding-top: 16px;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+.console.is-ready { opacity: 1; }
+.col { display: flex; flex-direction: column; min-height: 0; }
+.col .card { margin-bottom: 14px; }
+.col-left { overflow-y: auto; padding-right: 4px; }
+.col-center { align-items: center; justify-content: center; text-align: center; }
+.card-grow { flex: 1; min-height: 170px; display: flex; flex-direction: column; }
+
+/* ---------- Dépôt rapide ---------- */
+.dropzone {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  padding: 18px 12px; text-align: center; font-size: 0.86rem;
+  border: 1px dashed var(--line-strong); border-radius: 4px; cursor: pointer;
+  transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+}
+.dropzone:hover, .dropzone.is-over { border-color: var(--accent); background: var(--accent-soft); box-shadow: inset 0 0 20px rgba(0, 212, 255, 0.15); }
+.dropzone.is-busy { opacity: 0.6; cursor: wait; }
+.drop-icon { font-size: 1.5rem; color: var(--accent); text-shadow: var(--glow); }
+.dropzone .muted { font-size: 0.75rem; }
+
+/* ---------- Flux d'informations ---------- */
+.feed { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; overflow-y: auto; }
+.feed > li {
+  border-left: 2px solid var(--accent); background: var(--info-soft);
+  padding: 8px 10px; font-size: 0.82rem;
+  animation: appear 0.4s ease both;
+}
+.feed > li.warning, .feed > li.suspect { border-left-color: var(--warn); background: var(--warn-soft); }
+.feed > li.danger, .feed > li.dangerous { border-left-color: var(--danger); background: var(--danger-soft); }
+.feed > li.safe { border-left-color: var(--ok); }
+.feed strong { display: block; color: var(--ink); font-size: 0.84rem; }
+.feed time { display: block; color: var(--text-muted); font-size: 0.68rem; margin-top: 4px; font-family: var(--mono); }
+.feed ul { margin: 4px 0 0; padding-left: 16px; color: var(--text-muted); }
+
+/* ---------- Le compagnon : un « réacteur » en anneaux ---------- */
+.orb { position: relative; width: min(320px, 62vw); aspect-ratio: 1; display: grid; place-items: center; margin-bottom: 20px; }
+.ring { position: absolute; border-radius: 50%; }
+/* anneau extérieur en pointillés, très lent */
+.ring-1 { inset: 0; border: 1px dashed rgba(0, 212, 255, 0.35); animation: spin 60s linear infinite; }
+/* graduations façon cadran : un dégradé conique répété, découpé en anneau fin */
+.ring-ticks {
+  inset: 5%;
+  background: repeating-conic-gradient(var(--accent) 0 0.8deg, transparent 0.8deg 7.5deg);
+  -webkit-mask: radial-gradient(circle, transparent 66%, #000 67%, #000 71%, transparent 72%);
+          mask: radial-gradient(circle, transparent 66%, #000 67%, #000 71%, transparent 72%);
+  opacity: 0.7; animation: spin 30s linear infinite reverse;
+}
+/* deux arcs épais qui tournent */
+.ring-2 {
+  inset: 14%; border: 3px solid transparent;
+  border-top-color: var(--accent); border-bottom-color: var(--accent);
+  filter: drop-shadow(0 0 6px var(--accent)); animation: spin 9s linear infinite;
+}
+/* arc fin dans l'autre sens */
+.ring-3 {
+  inset: 21%; border: 1px solid transparent;
+  border-left-color: rgba(0, 212, 255, 0.8); border-right-color: rgba(0, 212, 255, 0.8);
+  animation: spin 14s linear infinite reverse;
+}
+/* cercle intérieur fixe avec halo */
+.ring-4 { inset: 28%; border: 1px solid var(--line-strong); box-shadow: 0 0 40px rgba(0, 212, 255, 0.25) inset, 0 0 30px rgba(0, 212, 255, 0.15); }
+.core {
+  position: relative; width: 30%; aspect-ratio: 1; border-radius: 50%;
+  display: grid; place-items: center;
+  background: radial-gradient(circle, #e8fdff 0%, #6fe9ff 18%, var(--accent) 42%, #005a7a 75%, #001a26 100%);
+  box-shadow: 0 0 25px var(--accent), 0 0 70px rgba(0, 212, 255, 0.45), 0 0 140px rgba(0, 212, 255, 0.2);
+  animation: pulse 3s ease-in-out infinite;
+}
+.wave { display: flex; gap: 3px; align-items: center; height: 32%; }
+.wave i { width: 3px; height: 100%; background: rgba(0, 30, 45, 0.85); border-radius: 2px; animation: wave 1.2s ease-in-out infinite; }
+.wave i:nth-child(2) { animation-delay: 0.15s; }
+.wave i:nth-child(3) { animation-delay: 0.3s; }
+.wave i:nth-child(4) { animation-delay: 0.45s; }
+.wave i:nth-child(5) { animation-delay: 0.6s; }
+.orb.is-busy .ring-2 { animation-duration: 1.5s; }
+.orb.is-busy .core { animation-duration: 0.7s; }
+
+.companion-name {
+  font-family: var(--display); letter-spacing: 0.55em; font-size: 1.6rem; margin: 0 0 10px;
+  padding-left: 0.55em; color: var(--ink); text-shadow: var(--glow);
+}
+.companion-status {
+  display: inline-flex; align-items: center; gap: 8px; margin: 0 0 28px;
+  font-family: var(--mono); font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--accent); padding: 4px 14px; border: 1px solid var(--line-strong); border-radius: 999px; background: var(--accent-soft);
+}
+.companion-status::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); box-shadow: var(--glow); animation: blink 2s infinite; }
+
+.mini-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 0; width: min(480px, 100%); }
+.mini-stats .card { margin: 0; padding: 10px 6px; }
+.mini-stats dt { font-size: 0.66rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.14em; }
+.mini-stats dd { margin: 4px 0 0; font-size: 1.4rem; color: var(--accent); font-family: var(--mono); text-shadow: var(--glow); }
+
+/* ---------- Messages du compagnon ---------- */
+.card-chat { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+.chat { list-style: none; margin: 0; padding: 0 2px; flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+.chat li { max-width: 90%; padding: 9px 12px; font-size: 0.86rem; line-height: 1.45; animation: appear 0.3s ease both; }
+.chat .bot { align-self: flex-start; background: var(--info-soft); border: 1px solid var(--line); border-left: 2px solid var(--accent); }
+.chat .bot::before { content: "SENTINELLE"; display: block; font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.2em; color: var(--accent); margin-bottom: 3px; }
+.chat-soon { margin: 12px 0 0; padding: 8px 10px; border: 1px dashed var(--line); font-size: 0.75rem; color: var(--text-muted); font-family: var(--mono); text-align: center; }
+
+/* ---------- Écran de démarrage : un vrai journal de ce qui se passe ---------- */
+.boot {
+  position: fixed; inset: 0; z-index: 10;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 24px;
+  background-color: #03060a;
+  background-image: radial-gradient(ellipse at center, rgba(0, 212, 255, 0.12), transparent 60%);
+  transition: opacity 0.7s ease, visibility 0.7s;
+}
+.boot.is-done { opacity: 0; visibility: hidden; }
+.boot .orb { width: 130px; margin-bottom: 18px; }
+.boot-hello { margin: 0; font-family: var(--mono); color: var(--accent); letter-spacing: 0.3em; text-transform: uppercase; font-size: 0.75rem; }
+.boot-title { font-family: var(--display); font-size: clamp(1.5rem, 4vw, 2.3rem); margin: 6px 0 24px; color: var(--ink); text-align: center; text-shadow: var(--glow); }
+
+.boot-log {
+  width: min(560px, 100%); list-style: none; margin: 0 0 14px; padding: 14px 16px;
+  font-family: var(--mono); font-size: 0.8rem;
+  border: 1px solid var(--line); background: rgba(0, 10, 18, 0.7);
+  max-height: 46vh; overflow-y: auto;
+}
+.boot-log > li { padding: 3px 0; color: var(--text-muted); }
+.boot-log .step-line { display: flex; gap: 10px; align-items: baseline; }
+.boot-log .step-icon { width: 1.2em; flex-shrink: 0; text-align: center; }
+.boot-log .step-label { flex: 1; }
+.boot-log .step-time { color: var(--text-muted); font-size: 0.72rem; }
+.boot-log .step-detail { margin: 2px 0 4px 2.2em; padding: 0; list-style: none; color: var(--text-muted); font-size: 0.74rem; }
+.boot-log .step-detail li { animation: appear 0.25s ease both; }
+.boot-log li.active { color: var(--ink); }
+.boot-log li.active .step-icon { color: var(--accent); animation: blink 0.8s infinite; }
+.boot-log li.done { color: var(--text); }
+.boot-log li.done .step-icon { color: var(--ok); }
+.boot-log li.warn .step-icon, .boot-log li.warn .step-label { color: var(--warn); }
+.boot-log li.failed .step-icon, .boot-log li.failed .step-label { color: var(--danger); }
+.boot-log .ready { color: var(--accent); margin-top: 6px; text-shadow: var(--glow); }
+
+.boot-bar { width: min(560px, 100%); height: 3px; background: var(--line); overflow: hidden; }
+.boot-bar span { display: block; height: 100%; width: 0; background: var(--accent); box-shadow: var(--glow); transition: width 0.3s ease; }
+.boot-hint { margin: 12px 0 0; font-size: 0.75rem; color: var(--text-muted); font-family: var(--mono); min-height: 1.2em; }
+.boot-skip { position: absolute; bottom: 24px; right: 24px; }
+
+/* Demande du prénom au premier démarrage */
+.boot-name { width: min(560px, 100%); margin-top: 18px; animation: appear 0.4s ease both; }
+.boot-name label { display: block; font-family: var(--mono); font-size: 0.8rem; color: var(--accent); margin-bottom: 8px; letter-spacing: 0.05em; }
+.boot-name-row { display: flex; gap: 8px; }
+.boot-name-row input { flex: 1; min-width: 0; font-size: 1rem; }
+.boot-name-error { min-height: 1.2em; margin: 6px 0 0; font-size: 0.78rem; color: var(--danger); }
+
+/* « Bienvenue, prénom » : remplace le journal une fois tout prêt */
+.boot.is-welcome .boot-log, .boot.is-welcome .boot-bar, .boot.is-welcome .boot-intro,
+.boot.is-welcome .boot-title, .boot.is-welcome .boot-name { display: none; }
+.boot-welcome { text-align: center; animation: appear 0.6s ease both; }
+.boot-welcome-name {
+  font-family: var(--display); font-size: clamp(2rem, 6vw, 3.4rem); margin: 8px 0 0;
+  color: var(--ink); text-shadow: var(--glow); letter-spacing: 0.04em;
+}
+.boot-welcome-name span { color: var(--accent); }
+.boot.is-welcome .orb { width: 200px; }
+.boot.is-welcome .boot-welcome { order: 1; }
+.boot.is-welcome .boot-hint { order: 2; margin-top: 18px; }
+
+/* ---------- Animations ---------- */
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.06); } }
+@keyframes wave { 0%, 100% { transform: scaleY(0.35); } 50% { transform: scaleY(1); } }
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+@keyframes appear { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+/* ---------- Petits écrans : les colonnes s'empilent ---------- */
+@media (max-width: 1000px) {
+  .console-body .page { height: auto; }
+  .console { grid-template-columns: 1fr; }
+  .col-center { order: -1; padding: 16px 0; }
+  .card-chat { min-height: 420px; }
+  .mini-stats { grid-template-columns: repeat(2, 1fr); }
+}

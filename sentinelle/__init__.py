@@ -10,10 +10,10 @@ def create_app(config_class=Config):
 
     db_module.init_app(app)
 
-    from .routes import dashboard, network, mail_routes, alerts
+    from .routes import api, construction, dashboard, mail_routes
     app.register_blueprint(dashboard.bp)
-    app.register_blueprint(network.bp)
     app.register_blueprint(mail_routes.bp)
-    app.register_blueprint(alerts.bp)
+    app.register_blueprint(api.bp)
+    app.register_blueprint(construction.bp)
 
     return app

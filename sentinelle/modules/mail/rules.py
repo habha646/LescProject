@@ -9,6 +9,14 @@ from .parser import ParsedMail
 from ...models import MailVerdict
 
 DANGEROUS_EXTENSIONS = {".exe", ".scr", ".bat", ".js", ".vbs", ".jar", ".cmd", ".msi"}
+# Conseil affiché à l'utilisateur selon le verdict
+ADVICE = {
+    "safe": "Rien d'inquiétant n'a été détecté, mais reste prudent avec les pièces jointes inattendues.",
+    "suspect": "Ce mail présente des signes douteux. Ne clique sur rien et ne télécharge rien avant d'avoir "
+               "vérifié auprès de l'expéditeur par un autre moyen (téléphone, par exemple).",
+    "dangerous": "Ce mail est très probablement dangereux. Ne l'ouvre pas, ne clique sur aucun lien, "
+                 "et supprime-le. Si tu as déjà cliqué, préviens quelqu'un de l'équipe.",
+}
 URGENT_WORDS = ["urgent", "immédiatement", "votre compte sera fermé", "cliquez ici",
                 "vérifiez votre compte", "dernier avertissement"]
 
@@ -69,4 +77,4 @@ def score_mail(m: ParsedMail) -> MailVerdict:
             reasons.append("Aucun signal de risque détecté par nos règles actuelles.")
 
     return MailVerdict(verdict=verdict, score=score, reasons=reasons,
-                        links=m.links, attachments=m.attachments)
+                       links=m.links, attachments=m.attachments, explanation=ADVICE[verdict])

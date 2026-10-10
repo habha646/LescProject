@@ -1,0 +1,14 @@
+From: "Club Photo Lumiere" <noreply@clubphoto.example>
+Reply-To: bureau@clubphoto.example
+To: membres@clubphoto.example
+Subject: Sortie photo de dimanche
+Authentication-Results: mx.example.com; spf=pass; dkim=pass
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+
+Bonjour a tous,
+
+La sortie photo de dimanche aura lieu au parc des Buttes. Rendez-vous a 9h
+a l'entree principale. Repondez a ce mail pour confirmer votre presence.
+
+Le bureau du club
