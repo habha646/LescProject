@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 {% block title %}Analyse mail · Sentinelle{% endblock %}
+{# Si le mail est suspect ou dangereux, toute la page change de couleur (voir style.css) #}
+{% block body_class %}{% if verdict and verdict.verdict != "safe" %}threat-{{ verdict.verdict }}{% endif %}{% endblock %}
 {% block content %}
   {% set labels = {"safe": "Sûr", "suspect": "Suspect", "dangerous": "Dangereux"} %}
   <p class="kicker">Zone mail</p>

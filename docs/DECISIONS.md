@@ -14,4 +14,6 @@ défense individuelle — chacun doit pouvoir expliquer ces choix.
 | 2026-10-10 | Le JavaScript n'utilise jamais `innerHTML` avec des données, seulement `textContent` | Protection XSS : un nom d'appareil ou de fichier piégé ne peut pas exécuter de code | Harone |
 | 2026-10-10 | Le prénom de l'utilisateur est gardé dans le navigateur (localStorage), pas dans la base | Démo sur un autre PC sans données personnelles ; aucune donnée perso côté serveur (RGPD : minimisation) | Harone |
 | 2026-10-10 | Nettoyage : on garde seulement le module mail ; réseau, alertes et IA passent « en cours de construction » (ancien code dans la branche `sauvegarde-avant-nettoyage`) | Construire bloc par bloc, un module qui marche vraiment avant le suivant | Harone |
+| 2026-10-10 | Le parser lit aussi le HTML ; 5 nouvelles règles (Reply-To, IP, lien raccourci, texte de lien trompeur, demande d'infos sensibles) | Les phishings sont surtout en HTML ; passage de 4/10 à 10/10 sur notre jeu d'essai, 0 faux positif | Harone |
+| 2026-10-10 | L'interface passe au rouge (dangereux) ou à l'orange (suspect) | Une alerte doit se voir immédiatement ; le rouge n'est jamais utilisé ailleurs | Harone |
 | | | | |

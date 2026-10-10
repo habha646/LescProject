@@ -132,12 +132,36 @@ async function analyzeFile(file) {
     addInfo(v.verdict, `${VERDICT_LABEL[v.verdict]} · ${v.score}/100`, v.filename, v.reasons);
     say(v.explanation);
     renderStats(v.counts);
+    setThreat(v.verdict);
   } catch (err) {
     addInfo("warning", "Analyse du mail impossible", err.message);
+    setBusy(false);
   } finally {
     zone.classList.remove("is-busy");
-    setBusy(false);
+    document.querySelector(".col-center .orb").classList.remove("is-busy");
   }
+}
+
+/** Change la couleur de toute l'interface selon le verdict (voir « Thèmes de menace » dans style.css). */
+const THREAT_TEXT = {
+  dangerous: ["Menace détectée", "Ce mail est dangereux. Ne clique sur aucun lien et n'ouvre pas les pièces jointes."],
+  suspect: ["Mail suspect", "Ce mail présente des signes douteux. Vérifie auprès de l'expéditeur avant d'agir."],
+};
+
+function setThreat(verdict) {
+  document.body.classList.remove("threat-suspect", "threat-dangerous");
+  const banner = document.getElementById("threat-banner");
+  const info = THREAT_TEXT[verdict];
+  if (!info) {                      // mail sûr : on revient au bleu
+    banner.hidden = true;
+    setBusy(false);
+    return;
+  }
+  document.body.classList.add(`threat-${verdict}`);
+  document.getElementById("threat-title").textContent = info[0];
+  document.getElementById("threat-text").textContent = info[1];
+  banner.hidden = false;
+  document.getElementById("companion-status").textContent = info[0];
 }
 
 function setupDropzone() {
@@ -403,6 +427,7 @@ async function start() {
   setupDropzone();
   setupAssistant();
   document.getElementById("forget-name").addEventListener("click", forgetName);
+  document.getElementById("threat-ok").addEventListener("click", () => setThreat("safe"));
 
   let alreadyPlayed = false;
   try { alreadyPlayed = sessionStorage.getItem(BOOT_FLAG) === "1"; } catch (_) { /* rien */ }

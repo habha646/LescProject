@@ -1,5 +1,9 @@
 # Exercice 1 — Ta première règle de détection : le Reply-To
 
+> **Mise à jour du 10/10 :** cette règle est maintenant écrite dans `rules.py`
+> (`_check_reply_to`). Utilise ce guide pour **comprendre chaque ligne**, ou efface la
+> fonction et réécris-la toi-même en suivant les étapes : les tests te diront si c'est bon.
+
 Tu n'es pas nul : personne ne sait écrire une règle de détection la première fois.
 On va le faire ensemble, une étape à la fois. Ne saute aucune étape, et **tape le
 code toi-même au lieu de le copier-coller** : c'est en tapant qu'on retient.

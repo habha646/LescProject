@@ -44,3 +44,10 @@ def test_boot_checks_report_real_results(client):
     assert base["ok"] is True and "ok" in base["detail"]
     moteur = client.get("/api/demarrage/moteur-mail").get_json()
     assert "20 mails" in moteur["detail"]
+
+
+def test_mail_page_turns_red_for_dangerous_mail(client):
+    raw = open("samples/phishing/p01_facture_exe.eml", "rb").read()
+    resp = client.post("/mail/", data={"eml_file": (io.BytesIO(raw), "p01.eml")},
+                       content_type="multipart/form-data")
+    assert b'class="threat-dangerous"' in resp.data

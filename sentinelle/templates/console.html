@@ -45,6 +45,13 @@
 
 {# ===== 2. LA CONSOLE (3 colonnes) ===== #}
 {% block page %}
+  {# Bandeau affiché par console.js quand un mail suspect ou dangereux est analysé #}
+  <div class="threat-banner" id="threat-banner" role="alert" hidden>
+    <strong id="threat-title"></strong>
+    <span id="threat-text"></span>
+    <button type="button" class="btn-small" id="threat-ok">J'ai compris</button>
+  </div>
+
   <div class="console" id="console">
     <!-- Gauche : réseau (bientôt), déposer un mail, journal des résultats -->
     <aside class="col col-left">

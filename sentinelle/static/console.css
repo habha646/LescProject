@@ -40,7 +40,7 @@
   border: 1px dashed var(--line-strong); border-radius: 4px; cursor: pointer;
   transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
 }
-.dropzone:hover, .dropzone.is-over { border-color: var(--accent); background: var(--accent-soft); box-shadow: inset 0 0 20px rgba(0, 212, 255, 0.15); }
+.dropzone:hover, .dropzone.is-over { border-color: var(--accent); background: var(--accent-soft); box-shadow: inset 0 0 20px rgba(var(--accent-rgb), 0.15); }
 .dropzone.is-busy { opacity: 0.6; cursor: wait; }
 .drop-icon { font-size: 1.5rem; color: var(--accent); text-shadow: var(--glow); }
 .dropzone .muted { font-size: 0.75rem; }
@@ -65,7 +65,7 @@
 .orb { position: relative; width: min(320px, 62vw); aspect-ratio: 1; display: grid; place-items: center; margin-bottom: 20px; }
 .ring { position: absolute; border-radius: 50%; }
 /* anneau extérieur en pointillés, très lent */
-.ring-1 { inset: 0; border: 1px dashed rgba(0, 212, 255, 0.35); animation: spin 60s linear infinite; }
+.ring-1 { inset: 0; border: 1px dashed rgba(var(--accent-rgb), 0.35); animation: spin 60s linear infinite; }
 /* graduations façon cadran : un dégradé conique répété, découpé en anneau fin */
 .ring-ticks {
   inset: 5%;
@@ -83,16 +83,16 @@
 /* arc fin dans l'autre sens */
 .ring-3 {
   inset: 21%; border: 1px solid transparent;
-  border-left-color: rgba(0, 212, 255, 0.8); border-right-color: rgba(0, 212, 255, 0.8);
+  border-left-color: rgba(var(--accent-rgb), 0.8); border-right-color: rgba(var(--accent-rgb), 0.8);
   animation: spin 14s linear infinite reverse;
 }
 /* cercle intérieur fixe avec halo */
-.ring-4 { inset: 28%; border: 1px solid var(--line-strong); box-shadow: 0 0 40px rgba(0, 212, 255, 0.25) inset, 0 0 30px rgba(0, 212, 255, 0.15); }
+.ring-4 { inset: 28%; border: 1px solid var(--line-strong); box-shadow: 0 0 40px rgba(var(--accent-rgb), 0.25) inset, 0 0 30px rgba(var(--accent-rgb), 0.15); }
 .core {
   position: relative; width: 30%; aspect-ratio: 1; border-radius: 50%;
   display: grid; place-items: center;
-  background: radial-gradient(circle, #e8fdff 0%, #6fe9ff 18%, var(--accent) 42%, #005a7a 75%, #001a26 100%);
-  box-shadow: 0 0 25px var(--accent), 0 0 70px rgba(0, 212, 255, 0.45), 0 0 140px rgba(0, 212, 255, 0.2);
+  background: radial-gradient(circle, #ffffff 0%, rgba(var(--accent-rgb), 0.75) 18%, var(--accent) 42%, rgba(var(--accent-rgb), 0.35) 75%, #02080c 100%);
+  box-shadow: 0 0 25px var(--accent), 0 0 70px rgba(var(--accent-rgb), 0.45), 0 0 140px rgba(var(--accent-rgb), 0.2);
   animation: pulse 3s ease-in-out infinite;
 }
 .wave { display: flex; gap: 3px; align-items: center; height: 32%; }
@@ -136,7 +136,7 @@
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   padding: 24px;
   background-color: #03060a;
-  background-image: radial-gradient(ellipse at center, rgba(0, 212, 255, 0.12), transparent 60%);
+  background-image: radial-gradient(ellipse at center, rgba(var(--accent-rgb), 0.12), transparent 60%);
   transition: opacity 0.7s ease, visibility 0.7s;
 }
 .boot.is-done { opacity: 0; visibility: hidden; }
@@ -194,7 +194,8 @@
 /* On annule le style des boutons normaux (bordure, fond, majuscules) */
 .orb-button {
   all: unset; display: block; cursor: pointer; border-radius: 50%;
-  width: min(320px, 62vw); margin-bottom: 20px;
+  width: min(320px, 62vw, 42vh); margin-bottom: 20px;
+  flex-shrink: 0;                /* ne jamais écraser le cercle quand la place manque */
   -webkit-tap-highlight-color: transparent;
 }
 .orb-button .orb { margin: 0; width: 100%; transition: transform 0.25s ease; }
@@ -213,7 +214,7 @@
     inset 0 6px 10px rgba(255, 255, 255, 0.45),
     inset 0 -10px 16px rgba(0, 40, 60, 0.75),
     0 14px 26px rgba(0, 0, 0, 0.65),
-    0 0 30px var(--accent), 0 0 90px rgba(0, 212, 255, 0.5);
+    0 0 30px var(--accent), 0 0 90px rgba(var(--accent-rgb), 0.5);
 }
 .orb-button:hover .core::after, .orb-button:focus-visible .core::after { opacity: 1; }
 /* Clic : le bouton s'enfonce (ombres inversées) */
@@ -254,7 +255,7 @@ body.assistant-mode { overflow: hidden; }   /* pas de barre de défilement penda
 .assistant-terminal {
   width: min(720px, 100%); text-align: left;
   border: 1px solid var(--line-strong); background: rgba(0, 8, 14, 0.92);
-  box-shadow: 0 0 30px rgba(0, 212, 255, 0.15); animation: appear 0.4s ease both;
+  box-shadow: 0 0 30px rgba(var(--accent-rgb), 0.15); animation: appear 0.4s ease both;
 }
 .terminal-bar {
   display: flex; align-items: center; gap: 10px; padding: 6px 12px;
@@ -271,10 +272,23 @@ body.assistant-mode { overflow: hidden; }   /* pas de barre de défilement penda
 .terminal-screen .prompt { color: var(--accent); }
 .terminal-screen .ok { color: var(--ok); }
 .terminal-screen .soon-line { color: var(--warn); }
-.terminal-screen .last { color: var(--ink); text-shadow: 0 0 8px rgba(0, 212, 255, 0.5); }
+.terminal-screen .last { color: var(--ink); text-shadow: 0 0 8px rgba(var(--accent-rgb), 0.5); }
 /* curseur qui clignote, comme dans un vrai terminal */
 .terminal-screen::after { content: "█"; color: var(--accent); animation: blink 1s steps(1) infinite; }
 .terminal-actions { display: flex; justify-content: flex-end; gap: 8px; padding: 8px 12px; border-top: 1px solid var(--line); }
+
+/* ---------- Bandeau de menace (mail dangereux ou suspect) ---------- */
+.threat-banner {
+  display: flex; align-items: center; gap: 14px; flex-wrap: wrap; justify-content: space-between;
+  margin-top: 12px; padding: 10px 16px;
+  border: 1px solid var(--accent); background: rgba(var(--accent-rgb), 0.12);
+  box-shadow: var(--glow); animation: appear 0.3s ease both;
+}
+.threat-banner strong { font-family: var(--display); letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); }
+.threat-banner span { color: var(--ink); font-size: 0.9rem; flex: 1; min-width: 200px; }
+/* toute l'interface change de couleur en douceur */
+.card, .hud-nav a, .hud-clock, button, .ring, .core, .dropzone { transition: border-color 0.6s, color 0.6s, background-color 0.6s, box-shadow 0.6s; }
+body.threat-dangerous .ring-2 { animation-duration: 2.5s; }   /* le compagnon s'agite */
 
 /* ---------- Animations ---------- */
 @keyframes spin { to { transform: rotate(360deg); } }
