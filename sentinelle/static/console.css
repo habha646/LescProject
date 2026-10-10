@@ -20,6 +20,19 @@
 .col-center { align-items: center; justify-content: center; text-align: center; }
 .card-grow { flex: 1; min-height: 170px; display: flex; flex-direction: column; }
 
+/* ---------- Bloc « en cours de construction » dans une carte ---------- */
+.soon {
+  display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center;
+  padding: 16px 12px; border: 1px dashed var(--line); font-size: 0.85rem;
+}
+.soon strong { color: var(--accent); font-family: var(--display); letter-spacing: 0.08em; text-transform: uppercase; font-size: 0.78rem; }
+.soon .muted { font-size: 0.75rem; }
+.soon-mark {
+  width: 26px; height: 26px; border-radius: 50%; margin-bottom: 4px;
+  border: 2px dashed var(--line-strong); border-top-color: var(--accent);
+  animation: spin 6s linear infinite;
+}
+
 /* ---------- Dépôt rapide ---------- */
 .dropzone {
   display: flex; flex-direction: column; align-items: center; gap: 4px;
@@ -34,6 +47,8 @@
 
 /* ---------- Flux d'informations ---------- */
 .feed { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; overflow-y: auto; }
+/* Journal vide : on explique ce qui apparaîtra ici au lieu de laisser un trou */
+.feed:empty::before { content: "Les résultats de tes analyses de mail s'afficheront ici."; color: var(--text-muted); font-size: 0.8rem; font-style: italic; }
 .feed > li {
   border-left: 2px solid var(--accent); background: var(--info-soft);
   padding: 8px 10px; font-size: 0.82rem;
@@ -111,7 +126,9 @@
 .chat li { max-width: 90%; padding: 9px 12px; font-size: 0.86rem; line-height: 1.45; animation: appear 0.3s ease both; }
 .chat .bot { align-self: flex-start; background: var(--info-soft); border: 1px solid var(--line); border-left: 2px solid var(--accent); }
 .chat .bot::before { content: "SENTINELLE"; display: block; font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.2em; color: var(--accent); margin-bottom: 3px; }
-.chat-soon { margin: 12px 0 0; padding: 8px 10px; border: 1px dashed var(--line); font-size: 0.75rem; color: var(--text-muted); font-family: var(--mono); text-align: center; }
+.chat-form { display: flex; gap: 8px; margin-top: 12px; }
+.chat-form input { flex: 1; min-width: 0; }
+.chat-form input:disabled { cursor: not-allowed; opacity: 0.6; }
 
 /* ---------- Écran de démarrage : un vrai journal de ce qui se passe ---------- */
 .boot {
@@ -172,6 +189,92 @@
 .boot.is-welcome .orb { width: 200px; }
 .boot.is-welcome .boot-welcome { order: 1; }
 .boot.is-welcome .boot-hint { order: 2; margin-top: 18px; }
+
+/* ---------- Le cercle est un bouton : relief au survol, enfoncé au clic ---------- */
+/* On annule le style des boutons normaux (bordure, fond, majuscules) */
+.orb-button {
+  all: unset; display: block; cursor: pointer; border-radius: 50%;
+  width: min(320px, 62vw); margin-bottom: 20px;
+  -webkit-tap-highlight-color: transparent;
+}
+.orb-button .orb { margin: 0; width: 100%; transition: transform 0.25s ease; }
+.orb-button .core { transition: box-shadow 0.25s ease, filter 0.25s ease; }
+.orb-button .core::after {
+  /* reflet de lumière en haut à gauche : donne l'impression d'une surface bombée */
+  content: ""; position: absolute; inset: 8% 30% 55% 18%; border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(255, 255, 255, 0.55), transparent 70%);
+  opacity: 0; transition: opacity 0.25s ease;
+}
+/* Survol : le bouton « sort » de l'écran (ombre portée en bas + lumière en haut) */
+.orb-button:hover .orb, .orb-button:focus-visible .orb { transform: scale(1.07); }
+.orb-button:hover .core, .orb-button:focus-visible .core {
+  filter: brightness(1.12);
+  box-shadow:
+    inset 0 6px 10px rgba(255, 255, 255, 0.45),
+    inset 0 -10px 16px rgba(0, 40, 60, 0.75),
+    0 14px 26px rgba(0, 0, 0, 0.65),
+    0 0 30px var(--accent), 0 0 90px rgba(0, 212, 255, 0.5);
+}
+.orb-button:hover .core::after, .orb-button:focus-visible .core::after { opacity: 1; }
+/* Clic : le bouton s'enfonce (ombres inversées) */
+.orb-button:active .orb { transform: scale(0.95); }
+.orb-button:active .core {
+  filter: brightness(0.95);
+  box-shadow:
+    inset 0 -4px 8px rgba(255, 255, 255, 0.25),
+    inset 0 10px 18px rgba(0, 30, 45, 0.85),
+    0 2px 6px rgba(0, 0, 0, 0.6),
+    0 0 20px var(--accent);
+}
+.orb-button:focus-visible { outline: 2px solid var(--accent); outline-offset: 6px; }
+
+/* ---------- Mode assistant IA ---------- */
+/* 1. Tout disparaît sauf le cercle */
+.page > .hud-top, .col-left, .col-right, .center-info { transition: opacity 0.5s ease; }
+.assistant-mode .page > .hud-top, .assistant-mode .col-left,
+.assistant-mode .col-right, .assistant-mode .center-info { opacity: 0; pointer-events: none; }
+.assistant-mode .orb-button { cursor: default; pointer-events: none; }
+.assistant-stage .center-info { display: none; }
+body.assistant-mode { overflow: hidden; }   /* pas de barre de défilement pendant l'animation */
+
+/* 2. « Bienvenue, prénom » en grand sous le cercle */
+.assistant-welcome {
+  margin: 0; font-family: var(--display); font-size: clamp(2rem, 5vw, 3.2rem);
+  color: var(--ink); text-shadow: var(--glow); letter-spacing: 0.04em;
+  opacity: 0; transition: opacity 0.6s ease;
+}
+.assistant-welcome span { color: var(--accent); }
+.assistant-welcome.is-visible { opacity: 1; }
+
+/* 3. Le cercle rétrécit pour laisser la place au terminal */
+.orb-button { transition: width 0.7s ease, margin 0.7s ease; }
+.assistant-terminal-on .orb-button { width: 150px; margin-bottom: 14px; }
+
+/* 4. Le terminal */
+.assistant-terminal {
+  width: min(720px, 100%); text-align: left;
+  border: 1px solid var(--line-strong); background: rgba(0, 8, 14, 0.92);
+  box-shadow: 0 0 30px rgba(0, 212, 255, 0.15); animation: appear 0.4s ease both;
+}
+.terminal-bar {
+  display: flex; align-items: center; gap: 10px; padding: 6px 12px;
+  border-bottom: 1px solid var(--line); font-family: var(--mono); font-size: 0.72rem; color: var(--text-muted);
+}
+.terminal-dots { display: flex; gap: 5px; }
+.terminal-dots i { width: 9px; height: 9px; border-radius: 50%; background: var(--line-strong); }
+.terminal-dots i:first-child { background: var(--accent); }
+.terminal-screen {
+  margin: 0; padding: 14px 16px; height: min(46vh, 380px); overflow-y: auto;
+  font-family: var(--mono); font-size: 0.84rem; line-height: 1.6; color: var(--text);
+  white-space: pre-wrap; word-break: break-word;
+}
+.terminal-screen .prompt { color: var(--accent); }
+.terminal-screen .ok { color: var(--ok); }
+.terminal-screen .soon-line { color: var(--warn); }
+.terminal-screen .last { color: var(--ink); text-shadow: 0 0 8px rgba(0, 212, 255, 0.5); }
+/* curseur qui clignote, comme dans un vrai terminal */
+.terminal-screen::after { content: "█"; color: var(--accent); animation: blink 1s steps(1) infinite; }
+.terminal-actions { display: flex; justify-content: flex-end; gap: 8px; padding: 8px 12px; border-top: 1px solid var(--line); }
 
 /* ---------- Animations ---------- */
 @keyframes spin { to { transform: rotate(360deg); } }

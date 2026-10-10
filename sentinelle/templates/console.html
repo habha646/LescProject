@@ -46,8 +46,20 @@
 {# ===== 2. LA CONSOLE (3 colonnes) ===== #}
 {% block page %}
   <div class="console" id="console">
-    <!-- Gauche : déposer un mail + journal des résultats -->
+    <!-- Gauche : réseau (bientôt), déposer un mail, journal des résultats -->
     <aside class="col col-left">
+      <section class="card">
+        <header class="card-head">
+          <h2>Réseau</h2>
+          <button type="button" class="btn-small" disabled title="Bientôt disponible">Analyser</button>
+        </header>
+        <div class="soon">
+          <span class="soon-mark" aria-hidden="true"></span>
+          <strong>En cours de construction</strong>
+          <span class="muted">La liste des appareils de ton réseau s'affichera ici.</span>
+        </div>
+      </section>
+
       <section class="card">
         <header class="card-head"><h2>Dépôt rapide</h2></header>
         <label class="dropzone" id="dropzone">
@@ -66,15 +78,38 @@
 
     <!-- Centre : le compagnon et les compteurs -->
     <main class="col col-center">
-      {{ reactor() }}
-      <h1 class="companion-name">SENTINELLE</h1>
-      <p class="companion-status" id="companion-status">Prêt à analyser</p>
-      <dl class="mini-stats">
-        <div class="card"><dt>Analysés</dt><dd id="stat-total">–</dd></div>
-        <div class="card"><dt>Sûrs</dt><dd id="stat-safe">–</dd></div>
-        <div class="card"><dt>Suspects</dt><dd id="stat-suspect">–</dd></div>
-        <div class="card"><dt>Dangereux</dt><dd id="stat-dangerous">–</dd></div>
-      </dl>
+      {# Le cercle est un vrai bouton : cliquable à la souris ET au clavier (Tab + Entrée) #}
+      <button type="button" class="orb-button" id="orb-button" title="Ouvrir l'assistant IA"
+              aria-label="Ouvrir l'assistant IA">
+        {{ reactor() }}
+      </button>
+
+      <div class="center-info" id="center-info">
+        <h1 class="companion-name">SENTINELLE</h1>
+        <p class="companion-status" id="companion-status">Prêt à analyser</p>
+        <dl class="mini-stats">
+          <div class="card"><dt>Analysés</dt><dd id="stat-total">–</dd></div>
+          <div class="card"><dt>Sûrs</dt><dd id="stat-safe">–</dd></div>
+          <div class="card"><dt>Suspects</dt><dd id="stat-suspect">–</dd></div>
+          <div class="card"><dt>Dangereux</dt><dd id="stat-dangerous">–</dd></div>
+        </dl>
+      </div>
+
+      {# Mode « assistant IA » : caché tant qu'on n'a pas cliqué sur le cercle #}
+      <p class="assistant-welcome" id="assistant-welcome" hidden>
+        Bienvenue<span id="assistant-welcome-name"></span>
+      </p>
+      <section class="assistant-terminal" id="assistant-terminal" hidden aria-live="polite">
+        <header class="terminal-bar">
+          <span class="terminal-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+          <span>assistant-ia — sentinelle</span>
+        </header>
+        <pre class="terminal-screen" id="terminal-screen"></pre>
+        <div class="terminal-actions">
+          <button type="button" class="btn-small btn-ghost" id="terminal-skip">Tout afficher</button>
+          <button type="button" class="btn-small" id="assistant-close">Retour à la console</button>
+        </div>
+      </section>
     </main>
 
     <!-- Droite : les messages du compagnon -->
@@ -86,7 +121,11 @@
                   title="Efface le prénom gardé dans ce navigateur">Oublier mon nom</button>
         </header>
         <ol class="chat" id="chat" aria-live="polite"></ol>
-        <p class="chat-soon">Discussion avec le compagnon : en cours de construction.</p>
+        <form class="chat-form" aria-disabled="true">
+          <label for="chat-input" class="sr-only">Écrire au compagnon</label>
+          <input id="chat-input" type="text" disabled placeholder="En cours de construction">
+          <button type="submit" disabled>Envoyer</button>
+        </form>
       </section>
     </aside>
   </div>

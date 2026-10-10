@@ -64,7 +64,7 @@ samples/
   legit/                        10 mails normaux (ne doivent pas être détectés)
 tools/evaluate.py               mesure la détection sur samples/
 tests/                          les tests automatiques
-docs/                           décisions, rétrospectives, exercices
+docs/                           décisions, rétrospectives, exercices, COMPRENDRE-LE-PROJET.md (⭐ lis-le)
 ```
 
 ## Garde-fous en place

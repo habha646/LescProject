@@ -6,7 +6,8 @@
      3. Affichage : compteurs, journal « Informations », messages du compagnon
      4. Dépôt rapide d'un mail
      5. Écran de démarrage
-     6. start() : ce qui se lance à l'ouverture de la page
+     6. Assistant IA (clic sur le cercle)
+     7. start() : ce qui se lance à l'ouverture de la page
 
    RÈGLE DE SÉCURITÉ N°1 : on n'utilise JAMAIS innerHTML avec des données.
    Un nom de fichier ou une raison d'analyse peut contenir du HTML piégé
@@ -266,10 +267,141 @@ function hideBoot() {
   document.getElementById("console").classList.add("is-ready");
 }
 
-// ==================== 6. Au chargement de la page ====================
+// ==================== 6. Assistant IA (clic sur le cercle) ====================
+// Le déroulé : le cercle tourne très vite et tout disparaît -> il ralentit ->
+// « Bienvenue, prénom » -> un terminal tape la présentation.
+
+/** Le texte du terminal. Chaque ligne : [classe CSS, texte]. */
+const ASSISTANT_TEXT = [
+  ["prompt", "> Je suis ton assistant IA."],
+  ["", ""],
+  ["", "Voici ce que Sentinelle sait faire aujourd'hui :"],
+  ["ok", "  [✓] Analyser un mail : dépose un fichier .eml, je calcule un score de risque sur 100 et je t'explique pourquoi, en langage simple."],
+  ["ok", "  [✓] Garder l'historique des analyses, sans jamais stocker le contenu de tes mails."],
+  ["ok", "  [✓] Vérifier mon propre moteur à chaque démarrage, sur 20 mails d'essai."],
+  ["soon-line", "  [ ] Surveiller les appareils de ton réseau : en construction."],
+  ["soon-line", "  [ ] Répondre à tes questions : en construction."],
+  ["", ""],
+  ["prompt", "> Le projet"],
+  ["", "Sentinelle est un compagnon de sécurité qui tourne uniquement sur ton ordinateur. Il aide un particulier ou un petit entrepreneur à repérer les mails piégés, et bientôt les appareils inconnus sur son réseau, en expliquant tout simplement."],
+  ["", "Aucune donnée ne quitte ton PC."],
+  ["", ""],
+  ["last", "Pour le moment, je ne suis pas encore fonctionnel, mais j'espère l'être très bientôt."],
+];
+
+let assistantRun = 0;   // numéro de la séquence en cours : permet d'arrêter une séquence si on ferme
+
+const prefersReducedMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/** Change la vitesse de rotation des anneaux SANS saut : on modifie la vitesse de lecture
+    (playbackRate) des animations CSS déjà en cours, au lieu de les redémarrer. */
+function setSpin(rate) {
+  for (const anim of document.querySelector(".col-center .orb").getAnimations({ subtree: true })) {
+    anim.playbackRate = rate;
+  }
+}
+
+/** Fait passer la vitesse de `from` à `to` en douceur pendant `ms` millisecondes. */
+function rampSpin(from, to, ms, run) {
+  return new Promise((resolve) => {
+    const t0 = performance.now();
+    const timer = setInterval(() => {   // ~60 fois par seconde
+      if (run !== assistantRun) { clearInterval(timer); return resolve(); }
+      const t = Math.min((performance.now() - t0) / ms, 1);
+      const eased = 1 - (1 - t) ** 3;   // ralentit de plus en plus vers la fin
+      setSpin(from + (to - from) * eased);
+      if (t >= 1) { clearInterval(timer); resolve(); }
+    }, 16);
+  });
+}
+
+/** Tape le texte lettre par lettre. Le texte passe par textContent : aucun risque XSS. */
+async function typeTerminal(run) {
+  const screen = document.getElementById("terminal-screen");
+  screen.replaceChildren();
+  let instant = false;
+  document.getElementById("terminal-skip").onclick = () => { instant = true; };
+
+  for (const [cls, text] of ASSISTANT_TEXT) {
+    const line = el("span", cls);
+    if (screen.childNodes.length) screen.append("\n");   // retour à la ligne AVANT : le curseur reste au bout du texte
+    screen.append(line);
+    for (const char of text) {
+      if (run !== assistantRun) return;
+      line.textContent += char;
+      if (!instant) await pause(14);
+    }
+    screen.scrollTop = screen.scrollHeight;
+    if (!instant) await pause(120);
+  }
+  document.getElementById("terminal-skip").hidden = true;
+}
+
+async function openAssistant() {
+  const body = document.body;
+  if (body.classList.contains("assistant-mode")) return;
+  const run = ++assistantRun;
+  const still = () => run === assistantRun;
+  const quick = prefersReducedMotion();
+  const name = loadName();
+
+  // 1. Tout disparaît, le cercle s'emballe
+  body.classList.add("assistant-mode");
+  if (!quick) {
+    await rampSpin(1, 14, 400, run);
+    await pause(1100);
+    if (!still()) return;
+  }
+  body.classList.add("assistant-stage");
+
+  // 2. Le cercle ralentit, puis « Bienvenue, prénom »
+  if (!quick) await rampSpin(14, 1, 1600, run);
+  if (!still()) return;
+  const welcome = document.getElementById("assistant-welcome");
+  document.getElementById("assistant-welcome-name").textContent = name ? `, ${name}` : "";
+  welcome.hidden = false;
+  void welcome.offsetWidth;   // force le navigateur à afficher l'élément avant de lancer le fondu
+  welcome.classList.add("is-visible");
+  await pause(quick ? 600 : 2000);
+  welcome.classList.remove("is-visible");
+  await pause(quick ? 0 : 600);
+  if (!still()) return;
+  welcome.hidden = true;
+
+  // 3. Le terminal apparaît et tape la présentation
+  body.classList.add("assistant-terminal-on");   // le cercle rétrécit d'abord…
+  await pause(quick ? 0 : 700);
+  if (!still()) return;
+  const terminal = document.getElementById("assistant-terminal");
+  document.getElementById("terminal-skip").hidden = false;
+  terminal.hidden = false;
+  document.getElementById("assistant-close").focus({ preventScroll: true });
+  await typeTerminal(run);
+}
+
+function closeAssistant() {
+  assistantRun += 1;   // arrête la séquence en cours, où qu'elle en soit
+  setSpin(1);
+  document.body.classList.remove("assistant-mode", "assistant-stage", "assistant-terminal-on");
+  const welcome = document.getElementById("assistant-welcome");
+  welcome.hidden = true;
+  welcome.classList.remove("is-visible");
+  document.getElementById("assistant-terminal").hidden = true;
+}
+
+function setupAssistant() {
+  document.getElementById("orb-button").addEventListener("click", openAssistant);
+  document.getElementById("assistant-close").addEventListener("click", closeAssistant);
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && document.body.classList.contains("assistant-mode")) closeAssistant();
+  });
+}
+
+// ==================== 7. Au chargement de la page ====================
 
 async function start() {
   setupDropzone();
+  setupAssistant();
   document.getElementById("forget-name").addEventListener("click", forgetName);
 
   let alreadyPlayed = false;
