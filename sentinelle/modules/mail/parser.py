@@ -14,9 +14,9 @@ from __future__ import annotations
 import email
 import re
 from dataclasses import dataclass, field
+from email.header import decode_header, make_header
 from email.message import Message
 from html.parser import HTMLParser
-from email.header import decode_header, make_header
 
 _LINK_RE = re.compile(r'https?://[^\s"\'<>]+')
 
@@ -64,14 +64,20 @@ def _decode(part: Message) -> str:
     except Exception:
         return str(part.get_payload())
 
+
 def _decode_header(value) -> str:
-    """'=?UTF-8?B?VXJnZW50?=' -> 'Urgent'. Sans encodage, le texte reste tel quel."""
+    """'=?UTF-8?B?VXJnZW50?=' -> 'Urgent'. Sans encodage, le texte reste tel quel.
+
+    SECURITE : pour l'OBJET seulement, jamais avant parseaddr(). Decode, un nom affiche
+    peut contenir une fausse adresse qui trompe parseaddr et cache celle de l'escroc.
+    """
     if not value:
         return ""
     try:
         return str(make_header(decode_header(str(value))))
     except Exception:
         return str(value)
+
 
 def parse_eml(raw_bytes: bytes) -> ParsedMail:
     msg: Message = email.message_from_bytes(raw_bytes)
@@ -100,10 +106,10 @@ def parse_eml(raw_bytes: bytes) -> ParsedMail:
 
     return ParsedMail(
         subject=_decode_header(msg.get("Subject")),
-        from_addr=_decode_header(msg.get("From")),
+        from_addr=msg.get("From", ""),     # brut : voir _decode_header
         headers={
             "authentication_results": msg.get("Authentication-Results", ""),
-            "reply_to": _decode_header(msg.get("Reply-To")),
+            "reply_to": msg.get("Reply-To", ""),   # brut : voir _decode_header
         },
         links=links,
         anchors=reader.anchors,
