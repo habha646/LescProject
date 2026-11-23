@@ -19,6 +19,7 @@ from email.utils import parseaddr
 from urllib.parse import urlparse
 
 from .parser import ParsedMail
+from .sublime_rules import run_sublime_rules
 from ...models import MailVerdict
 
 # Conseil affiché à l'utilisateur selon le verdict
@@ -140,9 +141,9 @@ def _check_links(m: ParsedMail, reasons: list[str]) -> int:
             flag("ip", 30, f"Lien vers une adresse IP au lieu d'un nom de site : {link}")
         elif _without_www(host) in URL_SHORTENERS:
             flag("short", 20, f"Lien raccourci qui cache sa vraie destination : {link}")
-        elif "xn--" in host or "@" in link or host.count(".") >= 4:
-            # xn-- = lettres étrangères qui imitent des lettres normales ; beaucoup de points =
-            # « ma-banque.fr.site-pirate.test » pour que le début ressemble au vrai site.
+        elif "@" in link or host.count(".") >= 4:
+            # Beaucoup de points = « ma-banque.fr.site-pirate.test » pour que le début ressemble
+            # au vrai site. (Le punycode « xn-- » est maintenant vérifié dans sublime_rules.py.)
             flag("odd", 20, f"Adresse de lien trompeuse : {link}")
     return sum(found.values())
 
@@ -186,6 +187,16 @@ def _check_sensitive_request(m: ParsedMail, reasons: list[str]) -> int:
     return 0
 
 
+def _check_sublime(m: ParsedMail, reasons: list[str]) -> int:
+    """Les règles adaptées de Sublime Security (voir sublime_rules.py). Les points dépendent
+    de la gravité de chaque règle : low 10, medium 20, high 40, critical 50."""
+    score = 0
+    for rule, reason in run_sublime_rules(m):
+        reasons.append(f"{reason} [règle Sublime : {rule.name}]")
+        score += rule.points
+    return score
+
+
 RULES = [
     _check_auth_headers,
     _check_attachments,
@@ -194,6 +205,7 @@ RULES = [
     _check_link_text,
     _check_urgency,
     _check_sensitive_request,
+    _check_sublime,
 ]
 
 

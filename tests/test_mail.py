@@ -120,3 +120,20 @@ def test_encoded_name_cannot_hide_reply_to():
 def test_broken_encoded_header_does_not_crash():
     v = analyze_eml(b"From: a@b.example\nSubject: =?inconnu?Q?abc?=\n\nBonjour.\n")
     assert v.verdict in ("safe", "suspect", "dangerous")
+
+
+def test_raw_utf8_header_does_not_crash():
+    # Vrai cas (échantillon Sublime « punycode_robinhood ») : un en-tête avec des accents NON
+    # encodés faisait planter l'analyse (AttributeError: 'Header' object has no attribute 'lower').
+    raw = ("From: a@b.example\nAuthentication-Results: mx.example; spf=fail (domaine robínhood.com)\n"
+           "Subject: Info\n\nBonjour.\n").encode("utf-8")
+    v = analyze_eml(raw)
+    assert any("SPF/DKIM" in r for r in v.reasons)
+
+
+def test_raw_utf8_subject_is_read():
+    # Vrai cas (phishing_pot) : objet en UTF-8 brut, sans encodage =?...?=.
+    # Avant : « Imm��diatement » -> le mot d'urgence n'était pas trouvé.
+    raw = "From: a@b.example\nSubject: Agissez immédiatement\n\nBonjour.\n".encode("utf-8")
+    v = analyze_eml(raw)
+    assert any("agir vite" in r for r in v.reasons)
