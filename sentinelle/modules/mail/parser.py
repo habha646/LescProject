@@ -16,6 +16,7 @@ import re
 from dataclasses import dataclass, field
 from email.message import Message
 from html.parser import HTMLParser
+from email.header import decode_header, make_header
 
 _LINK_RE = re.compile(r'https?://[^\s"\'<>]+')
 
@@ -63,6 +64,14 @@ def _decode(part: Message) -> str:
     except Exception:
         return str(part.get_payload())
 
+def _decode_header(value) -> str:
+    """'=?UTF-8?B?VXJnZW50?=' -> 'Urgent'. Sans encodage, le texte reste tel quel."""
+    if not value:
+        return ""
+    try:
+        return str(make_header(decode_header(str(value))))
+    except Exception:
+        return str(value)
 
 def parse_eml(raw_bytes: bytes) -> ParsedMail:
     msg: Message = email.message_from_bytes(raw_bytes)
@@ -90,11 +99,11 @@ def parse_eml(raw_bytes: bytes) -> ParsedMail:
     links = list(dict.fromkeys(_LINK_RE.findall(plain) + hrefs))   # dict.fromkeys = enlève les doublons
 
     return ParsedMail(
-        subject=msg.get("Subject", ""),
-        from_addr=msg.get("From", ""),
+        subject=_decode_header(msg.get("Subject")),
+        from_addr=_decode_header(msg.get("From")),
         headers={
             "authentication_results": msg.get("Authentication-Results", ""),
-            "reply_to": msg.get("Reply-To", ""),
+            "reply_to": _decode_header(msg.get("Reply-To")),
         },
         links=links,
         anchors=reader.anchors,
