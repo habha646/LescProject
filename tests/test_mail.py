@@ -90,3 +90,19 @@ def test_sensitive_word_must_be_a_whole_word():
     # « rib » est un mot sensible, mais pas quand il est caché dans « attribut »
     v = analyze_eml(_mail("", "Voici un attribut du fichier."))
     assert v.verdict == "safe"
+
+
+# ---------- en-têtes encodés (RFC 2047) ----------
+
+URGENT_ENCODE = b"""From: a@b.example
+Subject: =?UTF-8?B?VXJnZW50IDogdm90cmUgY29tcHRlIHNlcmEgZmVybcOp?=
+Content-Type: text/plain
+
+Bonjour.
+"""
+
+
+def test_encoded_subject_is_decoded():
+    # L'objet est « Urgent : votre compte sera fermé », mais encodé en base64.
+    v = analyze_eml(URGENT_ENCODE)
+    assert any("agir vite" in r for r in v.reasons)
