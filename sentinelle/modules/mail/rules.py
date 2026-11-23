@@ -18,6 +18,7 @@ import unicodedata
 from email.utils import parseaddr
 from urllib.parse import urlparse
 
+from .marques import find_impersonated_brand, find_lookalike_domain
 from .parser import ParsedMail
 from .sublime_rules import run_sublime_rules
 from ...models import MailVerdict
@@ -69,6 +70,14 @@ def _host_of_url(url: str) -> str:
         return (urlparse(url.strip()).hostname or "").lower()
     except ValueError:
         return ""
+
+
+def _root_domain(domain: str) -> str:
+    """'mail.banque.co.uk' -> 'banque.co.uk'. Même approximation que sublime_rules.py."""
+    labels = domain.lower().strip(".").split(".")
+    if len(labels) >= 3 and labels[-2] in ("co", "com", "org", "net", "gov", "ac", "edu") and len(labels[-1]) == 2:
+        return ".".join(labels[-3:])
+    return ".".join(labels[-2:])
 
 
 def _without_www(host: str) -> str:
@@ -187,6 +196,26 @@ def _check_sensitive_request(m: ParsedMail, reasons: list[str]) -> int:
     return 0
 
 
+def _check_brand_impersonation(m: ParsedMail, reasons: list[str]) -> int:
+    """Le nom affiché dit « PayPal », mais l'adresse ne vient pas de PayPal (voir marques.py).
+    Inspiré des règles « Brand impersonation » de Sublime Security, sans leur IA."""
+    domain = _domain_of_address(m.sender_email)
+    if not domain:
+        return 0
+    root = _root_domain(domain)
+    score = 0
+    brand = find_impersonated_brand(m.sender_name, root)
+    if brand:
+        reasons.append(f"Le mail se présente comme « {m.sender_name} » mais vient de {domain}, "
+                       f"qui n'appartient pas à {brand} (usurpation de marque).")
+        score += 40
+    lookalike = find_lookalike_domain(root)
+    if lookalike:
+        reasons.append(f"Le domaine de l'expéditeur ({root}) imite la marque « {lookalike} » sans lui appartenir.")
+        score += 40
+    return score
+
+
 def _check_sublime(m: ParsedMail, reasons: list[str]) -> int:
     """Les règles adaptées de Sublime Security (voir sublime_rules.py). Les points dépendent
     de la gravité de chaque règle : low 10, medium 20, high 40, critical 50."""
@@ -205,6 +234,7 @@ RULES = [
     _check_link_text,
     _check_urgency,
     _check_sensitive_request,
+    _check_brand_impersonation,
     _check_sublime,
 ]
 
