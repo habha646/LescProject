@@ -106,3 +106,17 @@ def test_encoded_subject_is_decoded():
     # L'objet est « Urgent : votre compte sera fermé », mais encodé en base64.
     v = analyze_eml(URGENT_ENCODE)
     assert any("agir vite" in r for r in v.reasons)
+
+
+def test_encoded_name_cannot_hide_reply_to():
+    # Decode, le nom affiche contient une fausse adresse <x@banque.example>.
+    raw = (b'From: "Banque" <noreply@banque.example>\n'
+           b'Reply-To: =?UTF-8?Q?Support_=3Cx=40banque.example=3E?= <pirate@freemail.test>\n'
+           b'Subject: Info\n\nBonjour.\n')
+    v = analyze_eml(raw)
+    assert any("autre domaine" in r for r in v.reasons)
+
+
+def test_broken_encoded_header_does_not_crash():
+    v = analyze_eml(b"From: a@b.example\nSubject: =?inconnu?Q?abc?=\n\nBonjour.\n")
+    assert v.verdict in ("safe", "suspect", "dangerous")
